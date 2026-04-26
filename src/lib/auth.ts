@@ -31,11 +31,11 @@ export function getRoleFromToken(token: string): string | null {
 export function getDashboardRoute(role: string): string {
   switch (role.toLowerCase()) {
     case "admin":
-      return "/admin/dashboard";
+      return "/dashboard";
     case "teacher":
       return "/teacher/dashboard";
     case "student":
-      return "/student/dashboard";
+      return "/student";
     default:
       return "/login";
   }

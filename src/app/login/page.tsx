@@ -159,9 +159,9 @@ export default function LoginPage() {
                   className="border-red-500/20 bg-red-500/10 text-red-400 [&>svg]:text-red-400"
                 >
                   <AlertCircle className="h-3.5 w-3.5" />
-                  <AlertDialogDescription className="text-xs">
+                  <p className="text-xs">
                     {error}
-                  </AlertDialogDescription>
+                  </p>
                 </Alert>
               )}
 
