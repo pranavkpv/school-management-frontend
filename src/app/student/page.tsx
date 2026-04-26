@@ -1,14 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
+import { useRouter } from "next/navigation";
 import { PageHeader } from "@/components/shared/page-header";
 import { DataTable, TableColumn } from "@/components/shared/data-table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { FeeResponse, getStudentFees } from "@/api/fees";
-
-
+import { initiatePaypalPayment } from "@/api/fees";
 
 type FeeRow = {
   _id: string;
@@ -19,155 +18,86 @@ type FeeRow = {
 };
 
 export default function FeesPage() {
-
-  const [rows, setRows] =
-    useState<FeeRow[]>([]);
-
-  const [loading, setLoading] =
-    useState(true);
+  const router = useRouter();
+  const [rows, setRows] = useState<FeeRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [payingId, setPayingId] = useState<string | null>(null);
 
   useEffect(() => {
-
     async function loadFees() {
-
       try {
-
-        const data:
-          FeeResponse[] =
-          await getStudentFees();
-
-        const mapped =
-          data.map(
-            (
-              fee,
-              index
-            ) => ({
-              _id:
-                String(index + 1),
-              studentName:
-                "You",
-
-              amount:
-                fee.amount,
-
-              dueDate:
-                fee.monthOfPayment,
-                
-              status:
-                (
-                  fee.paymentStatus === "PAID"
-                    ? "paid"
-                    : "pending"
-                ) as "paid" | "pending"
-            })
-          );
-
+        const data: FeeResponse[] = await getStudentFees();
+        console.log(data)
+        const mapped = data.map((fee, index) => ({
+          _id: fee._id,                         
+          studentName: "You",
+          amount: fee.amount,
+          dueDate: fee.monthOfPayment,
+          status: (fee.paymentStatus === "PAID" ? "paid" : "pending") as "paid" | "pending",
+        }));
         setRows(mapped);
-
       } catch (error) {
-
-        console.error(
-          "Failed to load fees",
-          error
-        );
-
+        console.error("Failed to load fees", error);
       } finally {
-
         setLoading(false);
-
       }
     }
-
     loadFees();
-
   }, []);
 
-  const handleDummyPay =
-    (id: string) => {
+  const handlePay = async (feeId: string) => {
+    try {
+      setPayingId(feeId);
+      const { approvalUrl } = await initiatePaypalPayment(feeId);
+      console.log(approvalUrl)
+      // Redirect user to PayPal
+      window.location.href = approvalUrl;
+    } catch (err) {
+      console.error("Payment initiation failed", err);
+      alert("Could not start payment. Please try again.");
+    } finally {
+      setPayingId(null);
+    }
+  };
 
-      alert(
-        `Dummy pay clicked for ${ id }`
-      );
-
-    };
-
-  const columns:
-    Array<TableColumn<FeeRow>> = [
-
-      {
-        key: "studentName",
-        label: "Student"
-      },
-
-      {
-        key: "amount",
-        label: "Amount",
-        render: (row) =>
-          `₹${ row.amount }`
-      },
-
-      {
-        key: "dueDate",
-        label: "Month"
-      },
-
-      {
-        key: "status",
-        label: "Status",
-        render: (row) => (
-          <Badge
-            variant={
-              row.status === "paid"
-                ? "default"
-                : "secondary"
-            }
+  const columns: Array<TableColumn<FeeRow>> = [
+    { key: "studentName", label: "Student" },
+    { key: "amount", label: "Amount", render: (row) => `₹${row.amount}` },
+    { key: "dueDate", label: "Month" },
+    {
+      key: "status",
+      label: "Status",
+      render: (row) => (
+        <Badge variant={row.status === "paid" ? "default" : "secondary"}>
+          {row.status}
+        </Badge>
+      ),
+    },
+    {
+      key: "_id",
+      label: "Action",
+      render: (row) =>
+        row.status === "pending" ? (
+          <Button
+            onClick={() => handlePay(row._id)}
+            disabled={payingId === row._id}
           >
-            {row.status}
-          </Badge>
-        )
-      },
-
-      {
-        key: "_id",
-        label: "Action",
-        render: (row) => (
-          row.status === "pending" ? (
-            <Button
-              onClick={() =>
-                handleDummyPay(
-                  row._id
-                )
-              }
-            >
-              Pay Now
-            </Button>
-          ) : (
-            "—"
-          )
-        )
-      }
-
-    ];
+            {payingId === row._id ? "Redirecting..." : "Pay Now"}
+          </Button>
+        ) : (
+          "—"
+        ),
+    },
+  ];
 
   return (
     <div className="space-y-6">
-
-      <PageHeader
-        title="Pending Fees"
-        description="View pending fee payments."
-      />
-
+      <PageHeader title="Pending Fees" description="View pending fee payments." />
       <DataTable
         columns={columns}
         rows={rows}
-        emptyText={
-          loading
-            ? "Loading fees..."
-            : "No pending fee records."
-        }
+        emptyText={loading ? "Loading fees..." : "No pending fee records."}
       />
-
     </div>
   );
-
 }
