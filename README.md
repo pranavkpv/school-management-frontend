@@ -1,36 +1,129 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# School Management Frontend
 
-## Getting Started
+Frontend for the School Management System built with Next.js.
 
-First, run the development server:
+## Repository
+
+```bash
+git clone https://github.com/pranavkpv/school-management-frontend.git
+cd school-management-frontend
+```
+
+---
+
+## Install Dependencies
+
+```bash
+npm install
+```
+
+---
+
+## Environment Setup
+
+Create a `.env.local` file in the root directory:
+
+```env
+NEXT_PUBLIC_API_BASE_URL=http://localhost:5000/api
+```
+
+This connects the frontend to the backend API.
+
+---
+
+## Run Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+http://localhost:3000
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## Backend Requirement
 
-To learn more about Next.js, take a look at the following resources:
+Make sure the backend server is running at:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+http://localhost:5000
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+If your backend runs on a different port, update:
 
-## Deploy on Vercel
+```env
+NEXT_PUBLIC_API_BASE_URL=your-backend-url
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Features
+
+- Student Login
+- Admin Dashboard
+- Student Management
+- Class Management
+- Fee Collection
+- Pending Fee Payments
+- Role-Based Access Control
+- Cookie-based Authentication
+
+---
+
+## Tech Stack
+
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
+- ShadCN UI
+
+---
+
+## Project Structure
+
+```bash
+app/
+components/
+api/
+public/
+```
+
+---
+
+## Start Project (Quick Setup)
+
+```bash
+git clone https://github.com/pranavkpv/school-management-frontend.git
+
+cd school-management-frontend
+
+npm install
+
+# create .env.local
+NEXT_PUBLIC_API_BASE_URL=http://localhost:5000/api
+
+npm run dev
+```
+
+---
+
+## Important
+
+Do not commit:
+
+```bash
+.env.local
+node_modules
+.next
+```
+
+Make sure `.gitignore` includes them.
+
+---
+
+## Author
+
+Pranav Raj K P V
