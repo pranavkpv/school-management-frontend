@@ -1,42 +1,23 @@
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+const BASE_URL = "http://localhost:5000/api";
 
-type RequestOptions = {
-  method?: "GET" | "POST" | "PATCH" | "DELETE";
-  body?: unknown;
-  token?: string;
-};
-
-async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    method: options.method || "GET",
+export async function apiFetch(
+  endpoint: string,
+  options: RequestInit = {}
+) {
+  const res = await fetch(`${BASE_URL}${endpoint}`, {
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
-      ...(options.token ? { Authorization: `Bearer ${options.token}` } : {}),
+      ...(options.headers || {}),
     },
-    body: options.body ? JSON.stringify(options.body) : undefined,
-    cache: "no-store",
+    ...options,
   });
 
-  if (!response.ok) {
-    const payload = (await response.json().catch(() => ({}))) as {
-      message?: string | string[];
-    };
-    const fallback = `Request failed: ${response.status}`;
-    const message = Array.isArray(payload.message)
-      ? payload.message.join(", ")
-      : payload.message || fallback;
-    throw new Error(message);
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.message || "Request failed");
   }
 
-  return (await response.json()) as T;
+  return data;
 }
-
-export const apiClient = {
-  get: <T>(path: string, token?: string) => request<T>(path, { method: "GET", token }),
-  post: <T>(path: string, body: unknown, token?: string) =>
-    request<T>(path, { method: "POST", body, token }),
-  patch: <T>(path: string, body: unknown, token?: string) =>
-    request<T>(path, { method: "PATCH", body, token }),
-  delete: <T>(path: string, token?: string) => request<T>(path, { method: "DELETE", token }),
-};
